@@ -1,4 +1,4 @@
-name: app-backend
+name: film-app-backend
 
 services:
   db:
@@ -11,10 +11,10 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
 
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5433:5432"
 
     volumes:
-      - database-data:/var/lib/postgresql/data
+      - film-postgres-data:/var/lib/postgresql/data
 
     healthcheck:
       test:
@@ -38,11 +38,11 @@ services:
       DB_URL: "jdbc:postgresql://db:5432/${DB_NAME:?DB_NAME is required}?connectTimeout=5"
       DB_USER: ${DB_USER:?DB_USER is required}
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
-      DB_POOL_SIZE: "5"
-      DB_MIN_IDLE: "1"
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-5}
+      DB_MIN_IDLE: ${DB_MIN_IDLE:-1}
 
     ports:
-      - "127.0.0.1:8080:8080"
+      - "8081:8080"
 
     depends_on:
       db:
@@ -51,6 +51,4 @@ services:
     stop_grace_period: 15s
 
 volumes:
-  database-data:
-    external: true
-    name: ${DB_VOLUME:?DB_VOLUME is required}
+  film-postgres-data:
