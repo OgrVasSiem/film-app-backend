@@ -33,6 +33,9 @@ services:
     restart: unless-stopped
 
     environment:
+      PACK_COVER_DIR: "/app/media/pack-covers"
+      POISKKINO_API_KEY: ${POISKKINO_API_KEY:-}
+      CATALOG_ADMIN_KEY: ${CATALOG_ADMIN_KEY:-}
       SERVER_HOST: "0.0.0.0"
       SERVER_PORT: "8080"
       DB_URL: "jdbc:postgresql://db:5432/${DB_NAME:?DB_NAME is required}?connectTimeout=5"
@@ -48,7 +51,25 @@ services:
       db:
         condition: service_healthy
 
+    volumes:
+      - ./media/pack-covers:/app/media/pack-covers:ro
+
     stop_grace_period: 15s
+
+  swagger:
+    image: swaggerapi/swagger-ui:v5.17.14
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "127.0.0.1:8082:8082"
+    environment:
+      URL: /openapi.json
+      VALIDATOR_URL: none
+    volumes:
+      - ./docs/api/services:/usr/share/nginx/html/services:ro
+      - ./docs/api/openapi.json:/usr/share/nginx/html/openapi.json:ro
+      - ./deploy/swagger/swagger-proxy.conf:/etc/nginx/conf.d/film-proxy.conf:ro
 
 volumes:
   film-postgres-data:

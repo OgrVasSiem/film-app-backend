@@ -1,0 +1,343 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Packs API",
+    "version": "1.0"
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Film": {
+        "$ref": "../openapi.json#/components/schemas/Film"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "paths": {
+    "/api/v1/packs": {
+      "get": {
+        "summary": "Каталог паков",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "premium": {
+                        "type": "boolean"
+                      },
+                      "locked": {
+                        "type": "boolean"
+                      },
+                      "coverUrl": {
+                        "type": "string",
+                        "example": "/api/v1/pack-covers/mind.jpg"
+                      },
+                      "isCompleted": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "title",
+                      "description",
+                      "premium",
+                      "locked",
+                      "coverUrl",
+                      "isCompleted"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Packs"
+        ],
+        "operationId": "getPacks"
+      }
+    },
+    "/api/v1/packs/{id}/films": {
+      "get": {
+        "summary": "Карточки пака",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Film"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "tags": [
+          "Packs"
+        ],
+        "operationId": "getPackFilms"
+      }
+    },
+    "/api/v1/pack-covers/{file}": {
+      "get": {
+        "tags": [
+          "Packs"
+        ],
+        "operationId": "getPackCover",
+        "security": [],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Local cover image",
+            "content": {
+              "image/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown file"
+          }
+        }
+      }
+    },
+    "/api/v1/packs/catalog": {
+      "get": {
+        "tags": [
+          "Packs"
+        ],
+        "operationId": "getCatalogWithCovers",
+        "parameters": [
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Personalized catalog with embedded covers keyed by coverUrl",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "packs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "premium": {
+                            "type": "boolean"
+                          },
+                          "locked": {
+                            "type": "boolean"
+                          },
+                          "coverUrl": {
+                            "type": "string",
+                            "example": "/api/v1/pack-covers/mind.jpg"
+                          },
+                          "isCompleted": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "description",
+                          "premium",
+                          "locked",
+                          "coverUrl",
+                          "isCompleted"
+                        ]
+                      }
+                    },
+                    "covers": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "mimeType": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "type": "string"
+                          },
+                          "base64": {
+                            "type": "string",
+                            "format": "byte"
+                          }
+                        },
+                        "required": [
+                          "mimeType",
+                          "sha256",
+                          "base64"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "packs",
+                    "covers"
+                  ]
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Use the cached catalog; no response body",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/packs/{id}/films/page": {
+      "get": {
+        "tags": [
+          "Packs"
+        ],
+        "operationId": "getPackFilmPage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 30
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Remaining cards in swipe order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Film"
+                      }
+                    },
+                    "nextCursor": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "nextCursor"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid cursor or limit"
+          },
+          "403": {
+            "description": "Premium required"
+          },
+          "404": {
+            "description": "Unknown pack"
+          }
+        }
+      }
+    }
+  }
+}

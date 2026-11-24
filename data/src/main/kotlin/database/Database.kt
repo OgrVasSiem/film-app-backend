@@ -3,11 +3,8 @@ package database
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import database.migration.DatabaseMigrator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.io.Closeable
-import java.sql.SQLException
 
 class Database(
     config: DatabaseConfig
@@ -29,6 +26,9 @@ class Database(
         }
     )
 
+    val filmStore: catalog.FilmStore = PostgresFilmStore(pool)
+    val packAdmin: catalog.packs.PackAdmin = database.importer.PostgresPackAdmin(pool, System.getenv("POISKKINO_API_KEY").orEmpty())
+
     fun migrate() {
         DatabaseMigrator(pool).migrate()
     }
@@ -43,16 +43,6 @@ class Database(
                     logger.debug("PostgreSQL connection OK")
                 }
             }
-        }
-    }
-
-    suspend fun isAvailable(): Boolean = withContext(Dispatchers.IO) {
-        try {
-            checkConnection()
-            true
-        } catch (exception: SQLException) {
-            logger.warn("Database health check failed", exception)
-            false
         }
     }
 

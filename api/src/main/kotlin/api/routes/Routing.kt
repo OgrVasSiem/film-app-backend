@@ -1,12 +1,13 @@
 package api.routes
 
-import io.ktor.server.application.*
-import io.ktor.server.routing.*
+import api.admin.packAdminRoutes
+import catalog.FilmStore
+import io.ktor.server.application.Application
+import io.ktor.server.routing.routing
 
-fun Application.configureRouting(
-    checkDatabase: suspend () -> Boolean,
-) {
+fun Application.configureRouting(filmStore: FilmStore, admin: catalog.packs.PackAdmin, adminKey: String) {
     routing {
-        healthRoutes(checkDatabase)
+        filmRoutes(filmStore)
+        packAdminRoutes(admin, adminKey)
     }
 }

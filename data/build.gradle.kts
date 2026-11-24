@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
     implementation(project(":domain"))
     implementation("com.zaxxer:HikariCP:7.0.2")
 

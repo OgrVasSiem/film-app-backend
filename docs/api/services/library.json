@@ -1,0 +1,137 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Library API",
+    "version": "1.0"
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Film": {
+        "$ref": "../openapi.json#/components/schemas/Film"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "paths": {
+    "/api/v1/library": {
+      "get": {
+        "summary": "Моя папка",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Film"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "WILL_WATCH",
+                "WONT_WATCH",
+                "WATCHED"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Library"
+        ],
+        "operationId": "getLibrary"
+      }
+    },
+    "/api/v1/library/{id}": {
+      "put": {
+        "summary": "Изменить статус фильма",
+        "responses": {
+          "204": {
+            "description": "Успешно"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "WILL_WATCH",
+                      "WONT_WATCH",
+                      "WATCHED"
+                    ]
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "tags": [
+          "Library"
+        ],
+        "operationId": "setFilmStatus"
+      },
+      "delete": {
+        "summary": "Сбросить статус фильма",
+        "responses": {
+          "204": {
+            "description": "Успешно"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "tags": [
+          "Library"
+        ],
+        "operationId": "clearFilmStatus"
+      }
+    }
+  }
+}

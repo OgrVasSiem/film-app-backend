@@ -1,0 +1,208 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Film App API",
+    "version": "1.0"
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "adminKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Admin-Key"
+      }
+    },
+    "schemas": {
+      "Film": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "posterUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "director": {
+            "type": "string",
+            "nullable": true
+          },
+          "actors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 5
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "posterUrl",
+          "year",
+          "director",
+          "actors",
+          "durationMinutes",
+          "genres"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "paths": {
+    "/api/v1/auth/register": {
+      "$ref": "services/auth.json#/paths/~1api~1v1~1auth~1register"
+    },
+    "/api/v1/auth/login": {
+      "$ref": "services/auth.json#/paths/~1api~1v1~1auth~1login"
+    },
+    "/api/v1/auth/logout": {
+      "$ref": "services/auth.json#/paths/~1api~1v1~1auth~1logout"
+    },
+    "/api/v1/me": {
+      "$ref": "services/profile.json#/paths/~1api~1v1~1me"
+    },
+    "/api/v1/packs": {
+      "$ref": "services/packs.json#/paths/~1api~1v1~1packs"
+    },
+    "/api/v1/packs/{id}/films": {
+      "$ref": "services/packs.json#/paths/~1api~1v1~1packs~1{id}~1films"
+    },
+    "/api/v1/library": {
+      "$ref": "services/library.json#/paths/~1api~1v1~1library"
+    },
+    "/api/v1/library/{id}": {
+      "$ref": "services/library.json#/paths/~1api~1v1~1library~1{id}"
+    },
+    "/admin/packs/{id}/sync": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Импортировать фильмы пака",
+        "operationId": "syncPack",
+        "security": [
+          {
+            "adminKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completed"
+          },
+          "401": {
+            "description": "Invalid admin key"
+          },
+          "404": {
+            "description": "Unknown pack"
+          },
+          "409": {
+            "description": "Busy or not ready"
+          },
+          "429": {
+            "description": "Local quota reached"
+          },
+          "503": {
+            "description": "Import paused; see state and events"
+          }
+        }
+      }
+    },
+    "/admin/packs/{id}/publish": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Опубликовать готовый пак",
+        "operationId": "publishPack",
+        "security": [
+          {
+            "adminKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completed"
+          },
+          "401": {
+            "description": "Invalid admin key"
+          },
+          "404": {
+            "description": "Unknown pack"
+          },
+          "409": {
+            "description": "Busy or not ready"
+          },
+          "429": {
+            "description": "Local quota reached"
+          },
+          "503": {
+            "description": "Import paused; see state and events"
+          }
+        }
+      }
+    },
+    "/api/v1/pack-covers/{file}": {
+      "$ref": "services/packs.json#/paths/~1api~1v1~1pack-covers~1{file}"
+    },
+    "/api/v1/packs/catalog": {
+      "$ref": "services/packs.json#/paths/~1api~1v1~1packs~1catalog"
+    },
+    "/api/v1/packs/{id}/films/page": {
+      "$ref": "services/packs.json#/paths/~1api~1v1~1packs~1{id}~1films~1page"
+    }
+  }
+}

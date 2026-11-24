@@ -31,9 +31,7 @@ fun main() {
         ) {
             configureRequestLogging()
             configureSerialization()
-            configureRouting(
-                checkDatabase = database::isAvailable,
-            )
+            configureRouting(database.filmStore, database.packAdmin, System.getenv("CATALOG_ADMIN_KEY").orEmpty())
             configureRequestId()
             configureErrorHandling()
         }
